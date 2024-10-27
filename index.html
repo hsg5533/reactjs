@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="./js/dayjs.js"></script>
+    <script src="./js/dayjsko.js"></script>
+    <script src="./js/babel.js"></script>
+    <script src="./js/react.js"></script>
+    <script src="./js/reactdom.js"></script>
+    <link rel="stylesheet" href="./css/index.css" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      dayjs.locale("ko");
+
+      class Logger extends React.Component {
+        constructor(props) {
+          super(props);
+          console.log("constructor");
+          this.state = {
+            time: "",
+          };
+        }
+
+        componentWillMount() {
+          console.log("componentWillMount 실행");
+        }
+
+        componentDidMount() {
+          console.log("componentDidMount 실행");
+        }
+
+        componentWillReceiveProps(newProps) {
+          console.log("componentWillReceiveProps 실행");
+          console.log("새로운 속성: ", newProps);
+          this.setState({ time: newProps.time });
+        }
+
+        componentWillUpdate(newProps, newState) {
+          console.log("componentWillUpdate 실행");
+          console.log("새로운 속성: ", newProps);
+          console.log("새로운 상태: ", newState);
+        }
+
+        shouldComponentUpdate(newProps, newState) {
+          console.log("shouldComponentUpdate 실행");
+          console.log("새로운 속성: ", newProps);
+          console.log("새로운 상태: ", newState);
+          return true;
+        }
+
+        componentDidUpdate(oldProps, oldState) {
+          console.log("componentDidUpdate 실행");
+          console.log("이전 속성: ", oldProps);
+          console.log("이전 상태: ", oldState);
+        }
+
+        componentWillUnmount() {
+          console.log("componentWillUnmount 실행");
+        }
+
+        render() {
+          return <div>{this.props.time}</div>;
+        }
+      }
+
+      function TimeComponent(props) {
+        const [value, setValue] = React.useState(null);
+
+        React.useEffect(() => {
+          setValue(props.prop);
+        }, [props.prop]);
+
+        // componentWillUnmount 대신 마운트 해제 시의 작업을 처리
+        React.useEffect(() => {
+          return () => {
+            console.log("componentWillUnmount");
+          };
+        }, []);
+
+        return (
+          <div>
+            <p style={{ fontSize: 18, color: "#ff0000" }}>
+              현재시간을 알려주는 컴포넌트입니다.
+            </p>
+            <p>{"현재시간은 " + value + " 입니다"}</p>
+          </div>
+        );
+      }
+
+      // 자식 컴포넌트
+      const ChildComponent = React.memo(({ onClick }) => {
+        console.log("ChildComponent rendering");
+        return <button onClick={onClick}>Click me (ChildComponent)</button>;
+      });
+
+      // 부모 컴포넌트
+      /**
+       * React.memo를 사용하면 부모컴포넌트가 변경될 때
+       * 자식컴포넌트에 대한 props나 state변경이 없다면
+       * 컴포넌트를 랜더링하지 않음
+       * */
+      const ParentComponent = React.memo(() => {
+        console.log("ParentComponent rendering");
+        const [count, setCount] = React.useState(0);
+
+        // useCallback을 사용하여 함수 메모이제이션
+        const handleClick = React.useCallback(() => {
+          console.log("Button clicked!");
+          // 여기서 상태를 업데이트하거나 다른 작업 수행
+          setCount(count + 1);
+        }, [count]); // count가 변경될 때만 새로운 콜백 함수 생성
+
+        return (
+          <div>
+            <h1>Count: {count}</h1>
+            {/* memo를 사용하여 자식 컴포넌트 감싸기 */}
+            <ChildComponent onClick={handleClick} />
+          </div>
+        );
+      });
+
+      function App() {
+        const [value, setValue] = React.useState(0);
+        const [debounce, setDebounce] = React.useState(0);
+        const [newTitle, setNewTitle] = React.useState("");
+        const [targetIdx, setTargetIdx] = React.useState(0);
+        const [modalFlag, setModalFlag] = React.useState(false);
+        const [date, setDate] = React.useState(
+          dayjs().format("YYYY년 MM월 DD일 dd A hh시 mm분 ss초")
+        );
+        const [post, setPost] = React.useState([
+          {
+            title: "서울 한강에서의 나만의 피크닉",
+            date: dayjs().format("YYYY-MM-DD dd A hh:mm:ss"),
+            like: 0,
+          },
+          {
+            title: "영종도에서 즐기는 힐링 바다뷰 카페",
+            date: dayjs().format("YYYY-MM-DD dd A hh:mm:ss"),
+            like: 0,
+          },
+          {
+            title: "맛있는 스타벅스 신메뉴 한잔",
+            date: dayjs().format("YYYY-MM-DD dd A hh:mm:ss"),
+            like: 0,
+          },
+          {
+            title: "강남에서 찾아낸 맛있는 타코 맛집",
+            date: dayjs().format("YYYY-MM-DD dd A hh:mm:ss"),
+            like: 0,
+          },
+          {
+            title: "부산 해안을 따라 즐기는 바다 산책",
+            date: dayjs().format("YYYY-MM-DD dd A hh:mm:ss"),
+            like: 0,
+          },
+          {
+            title: "영종도 바다뷰 카페 추천!",
+            date: dayjs().format("YYYY-MM-DD dd A hh:mm:ss"),
+            like: 0,
+          },
+          {
+            title: "영종도 바다뷰 카페 추천!",
+            date: dayjs().format("YYYY-MM-DD dd A hh:mm:ss"),
+            like: 0,
+          },
+          {
+            title: "자주 가는 카페에서 무슨 일이!?",
+            date: dayjs().format("YYYY-MM-DD dd A hh:mm:ss"),
+            like: 0,
+          },
+          {
+            title: "경남 아파트 값 폭락",
+            date: dayjs().format("YYYY-MM-DD dd A hh:mm:ss"),
+            like: 0,
+          },
+        ]);
+
+        const useDebounced = (callback, delay, deps) => {
+          const savedCallback = React.useRef();
+
+          React.useEffect(() => {
+            savedCallback.current = callback;
+          }, [callback]);
+
+          React.useEffect(() => {
+            const timer = setTimeout(() => {
+              savedCallback.current && savedCallback.current();
+            }, delay);
+
+            return () => {
+              clearTimeout(timer);
+            };
+          }, [delay, deps]);
+        };
+
+        // 커스텀 반복훅
+        const useInterval = (callback, delay) => {
+          const savedCallback = React.useRef();
+
+          React.useEffect(() => {
+            savedCallback.current = callback;
+          }, [callback]);
+
+          React.useEffect(() => {
+            if (delay !== null) {
+              const tick = setInterval(() => {
+                savedCallback.current && savedCallback.current();
+              }, delay);
+
+              return () => clearInterval(tick);
+            }
+          }, [delay]);
+        };
+
+        const useThrottle = (callback, time) => {
+          const isWaiting = React.useRef(false);
+          const callbackRef = React.useRef();
+
+          React.useEffect(() => {
+            callbackRef.current = callback;
+          }, [callback]);
+
+          return () => {
+            if (!isWaiting.current && callbackRef.current) {
+              isWaiting.current = true;
+              callbackRef.current();
+              setTimeout(() => (isWaiting.current = false), time);
+            }
+          };
+        };
+
+        React.useEffect(() => {
+          console.log("useEffect", value);
+        }, [value]);
+
+        useInterval(() => {
+          setDate(dayjs().format("YYYY년 MM월 DD일 dd A hh시 mm분 ss초"));
+        }, 1000);
+
+        useDebounced(() => setDebounce(value), 1000, value);
+
+        const requestSomething = () => {
+          console.log("콜백함수 호출");
+        };
+
+        const debounceHandler = useThrottle(() => {
+          console.log("스크롤 이벤트");
+          requestSomething();
+        }, 500);
+
+        React.useEffect(() => {
+          window.onbeforeunload = () => {
+            window.scrollTo(0, 0);
+          };
+          window.addEventListener("scroll", debounceHandler);
+          return () => {
+            window.removeEventListener("scroll", debounceHandler);
+          };
+        }, []);
+
+        return (
+          <div className="App">
+            <header>
+              <h1 className="logo">Sypear Blog</h1>
+            </header>
+            <main>
+              <div className="post-wrapper">
+                {post.map((item, idx) => {
+                  return (
+                    <article className="post" key={idx}>
+                      <h1
+                        className="post-title"
+                        onClick={() => {
+                          if (targetIdx !== idx) {
+                            setTargetIdx(idx);
+                            setModalFlag(true);
+                          } else {
+                            setModalFlag(!modalFlag);
+                          }
+                        }}
+                      >
+                        {item.title}
+                      </h1>
+                      <span className="post-date">{item.date}</span>
+                      <span
+                        className="post-like white-button"
+                        onClick={() => {
+                          const copyPost = [...post];
+                          copyPost[idx].like++;
+                          setPost(copyPost);
+                        }}
+                      >
+                        ❤️ LIKE <strong>{item.like}</strong>
+                      </span>
+                      <button
+                        type="button"
+                        className="post-delete-button black-button"
+                        onClick={() => {
+                          const copyPost = [...post];
+                          copyPost.splice(idx, 1);
+                          setPost(copyPost);
+                          setModalFlag(false);
+                        }}
+                      >
+                        삭제
+                      </button>
+                    </article>
+                  );
+                })}
+              </div>
+              <div className="post-manage-wrapper">
+                <div className="post-manage">
+                  <input
+                    className="input-title"
+                    type="text"
+                    placeholder="등록할 글 제목을 입력해주세요."
+                    onChange={(e) => {
+                      setNewTitle(e.target.value);
+                    }}
+                    value={newTitle}
+                  ></input>
+                  <button
+                    className="black-button"
+                    onClick={() => {
+                      const copyPost = [...post];
+                      copyPost.unshift({
+                        title: newTitle,
+                        date: dayjs().format("YYYY-MM-DD dd A hh:mm:ss"),
+                        like: 0,
+                      });
+                      setPost(copyPost);
+                      setNewTitle("");
+                    }}
+                  >
+                    등록
+                  </button>
+                </div>
+                <button
+                  className="white-button"
+                  onClick={() => {
+                    const copyPost = [...post];
+                    copyPost.sort((a, b) => {
+                      return a.title > b.title ? 1 : -1;
+                    });
+                    setPost(copyPost);
+                  }}
+                >
+                  가나다순 정렬
+                </button>
+              </div>
+              {modalFlag && (
+                <div className="content-wrapper">
+                  <article className="content">
+                    <h1 className="content-title">{post[targetIdx].title}</h1>
+                    <span className="content-date">{post[targetIdx].date}</span>
+                  </article>
+                </div>
+              )}
+              value값:{value} debounce값:{debounce}
+              <br />
+              <button
+                style={{ marginRight: 5 }}
+                onClick={() => {
+                  setValue(value + 1);
+                }}
+              >
+                +1
+              </button>
+              <button
+                style={{ marginLeft: 5 }}
+                onClick={() => {
+                  setValue(value - 1);
+                }}
+              >
+                -1
+              </button>
+              <TimeComponent prop={date} />
+              <ParentComponent />
+              <Logger time={date} />
+            </main>
+            <footer>
+              <h1 className="project-name">Simple React Blog</h1>
+              <span className="project-desc">
+                React 기초 학습을 위한 간단한 블로그 만들기
+              </span>
+            </footer>
+          </div>
+        );
+      }
+
+      const container = document.getElementById("root");
+      const root = ReactDOM.createRoot(container);
+      root.render(<App />);
+    </script>
+  </body>
+</html>
