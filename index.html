@@ -67,62 +67,6 @@
         }
       }
 
-      function TimeComponent(props) {
-        const [value, setValue] = React.useState(null);
-
-        React.useEffect(() => {
-          setValue(props.prop);
-        }, [props.prop]);
-
-        // componentWillUnmount 대신 마운트 해제 시의 작업을 처리
-        React.useEffect(() => {
-          return () => {
-            console.log("componentWillUnmount");
-          };
-        }, []);
-
-        return (
-          <div>
-            <p style={{ fontSize: 18, color: "#ff0000" }}>
-              현재시간을 알려주는 컴포넌트입니다.
-            </p>
-            <p>{"현재시간은 " + value + " 입니다"}</p>
-          </div>
-        );
-      }
-
-      // 자식 컴포넌트
-      const ChildComponent = React.memo(({ onClick }) => {
-        console.log("ChildComponent rendering");
-        return <button onClick={onClick}>Click me (ChildComponent)</button>;
-      });
-
-      // 부모 컴포넌트
-      /**
-       * React.memo를 사용하면 부모컴포넌트가 변경될 때
-       * 자식컴포넌트에 대한 props나 state변경이 없다면
-       * 컴포넌트를 랜더링하지 않음
-       * */
-      const ParentComponent = React.memo(() => {
-        console.log("ParentComponent rendering");
-        const [count, setCount] = React.useState(0);
-
-        // useCallback을 사용하여 함수 메모이제이션
-        const handleClick = React.useCallback(() => {
-          console.log("Button clicked!");
-          // 여기서 상태를 업데이트하거나 다른 작업 수행
-          setCount(count + 1);
-        }, [count]); // count가 변경될 때만 새로운 콜백 함수 생성
-
-        return (
-          <div>
-            <h1>Count: {count}</h1>
-            {/* memo를 사용하여 자식 컴포넌트 감싸기 */}
-            <ChildComponent onClick={handleClick} />
-          </div>
-        );
-      });
-
       function App() {
         const [value, setValue] = React.useState(0);
         const [debounce, setDebounce] = React.useState(0);
@@ -361,26 +305,6 @@
                   </article>
                 </div>
               )}
-              value값:{value} debounce값:{debounce}
-              <br />
-              <button
-                style={{ marginRight: 5 }}
-                onClick={() => {
-                  setValue(value + 1);
-                }}
-              >
-                +1
-              </button>
-              <button
-                style={{ marginLeft: 5 }}
-                onClick={() => {
-                  setValue(value - 1);
-                }}
-              >
-                -1
-              </button>
-              <TimeComponent prop={date} />
-              <ParentComponent />
               <Logger time={date} />
             </main>
             <footer>
